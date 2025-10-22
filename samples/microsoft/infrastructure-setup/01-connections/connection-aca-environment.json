@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.38.33.27573",
+      "templateHash": "17845355524495199668"
+    }
+  },
+  "parameters": {
+    "aiFoundryName": {
+      "type": "string",
+      "defaultValue": "<your-account-name>"
+    },
+    "connectedResourceName": {
+      "type": "string",
+      "defaultValue": "[format('ais-{0}', parameters('aiFoundryName'))]"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "westus"
+    },
+    "newOrExisting": {
+      "type": "string",
+      "defaultValue": "new",
+      "allowedValues": [
+        "new",
+        "existing"
+      ]
+    }
+  },
+  "resources": [
+    {
+      "condition": "[equals(parameters('newOrExisting'), 'new')]",
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2025-02-02-preview",
+      "name": "[parameters('connectedResourceName')]",
+      "location": "[parameters('location')]",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/connections",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}', parameters('aiFoundryName'), format('{0}-acaenvironment', parameters('aiFoundryName')))]",
+      "properties": {
+        "category": "AzureContainerAppEnvironment",
+        "authType": "AAD",
+        "isSharedToAll": true,
+        "credentials": {},
+        "metadata": {
+          "ApiType": "Azure",
+          "ResourceId": "[if(equals(parameters('newOrExisting'), 'new'), resourceId('Microsoft.App/managedEnvironments', parameters('connectedResourceName')), resourceId('Microsoft.App/managedEnvironments', parameters('connectedResourceName')))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', parameters('connectedResourceName'))]"
+      ]
+    }
+  ]
+}
