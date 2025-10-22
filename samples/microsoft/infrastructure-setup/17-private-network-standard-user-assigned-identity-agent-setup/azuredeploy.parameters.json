@@ -23,6 +23,9 @@
     "modelCapacity": {
       "value": 0
     },
+    "userAssignedIdentityName": {
+      "value": ""
+    },
     "deploymentTimestamp": {
       "value": ""
     },

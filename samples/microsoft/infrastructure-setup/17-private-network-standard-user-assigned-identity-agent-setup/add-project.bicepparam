@@ -27,3 +27,9 @@ param storageSubscriptionId = ''
 param existingCosmosDBName = '' // Replace with your actual Cosmos DB name
 param cosmosDBResourceGroupName = '' // Your resource group
 param cosmosDBSubscriptionId = ''
+
+// Existing User Assigned Identity details (from your original deployment)
+// You'll need to get these from your existing deployment outputs
+param existingUserAssignedIdentityName = '' // Replace with your actual user assigned identity name
+param userAssignedIdentityResourceGroupName = '' // Your resource group
+param userAssignedIdentitySubscriptionId = '' // Your subscription ID

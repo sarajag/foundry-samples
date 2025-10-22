@@ -16,6 +16,10 @@ param azureStorageName string
 param azureStorageSubscriptionId string
 param azureStorageResourceGroupName string
 
+param userAssignedIdentityName string
+param userAssignedIdentitySubscriptionId string
+param userAssignedIdentityResourceGroupName string
+
 // Add unique connection name parameter
 param uniqueConnectionSuffix string = ''
 
@@ -31,6 +35,10 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing 
   name: azureStorageName
   scope: resourceGroup(azureStorageSubscriptionId, azureStorageResourceGroupName)
 }
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' existing = {
+  name: userAssignedIdentityName
+  scope: resourceGroup(userAssignedIdentitySubscriptionId, userAssignedIdentityResourceGroupName)
+}
 
 resource account 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' existing = {
   name: accountName
@@ -42,7 +50,10 @@ resource project 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-previ
   name: projectName
   location: location
   identity: {
-    type: 'SystemAssigned'
+    type: 'UserAssigned' // Select 'UserAssigned' or 'SystemAssigned,UserAssigned' during creation as this cannot be updated.
+    userAssignedIdentities: {
+      '${userAssignedIdentity.id}': {}
+    }
   }
   properties: {
     description: projectDescription

@@ -50,6 +50,16 @@ param cosmosDBResourceGroupName string
 @description('Subscription ID containing the Cosmos DB account')
 param cosmosDBSubscriptionId string
 
+@description('Name of the existing User Assigned Identity')
+param existingUserAssignedIdentityName string
+
+@description('Resource group containing the User Assigned Identity')
+param userAssignedIdentityResourceGroupName string
+
+@description('Subscription ID containing the User Assigned Identity')
+param userAssignedIdentitySubscriptionId string
+
+
 // Create a short, unique suffix for this project
 param deploymentTimestamp string = utcNow('yyyyMMddHHmmss')
 var uniqueSuffix = substring(uniqueString('${resourceGroup().id}-${deploymentTimestamp}'), 0, 4)
@@ -77,6 +87,11 @@ resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' existing = 
   scope: resourceGroup(cosmosDBSubscriptionId, cosmosDBResourceGroupName)
 }
 
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' existing = {
+  name: existingUserAssignedIdentityName
+  scope: resourceGroup(userAssignedIdentitySubscriptionId, userAssignedIdentityResourceGroupName)
+}
+
 // Create the new project using the unique connection module
 module aiProject 'modules-network-secured/ai-project-identity-unique.bicep' = {
   name: 'ai-${finalProjectName}-${uniqueSuffix}-deployment'
@@ -97,6 +112,10 @@ module aiProject 'modules-network-secured/ai-project-identity-unique.bicep' = {
     azureStorageName: existingStorageName
     azureStorageSubscriptionId: storageSubscriptionId
     azureStorageResourceGroupName: storageResourceGroupName
+
+    userAssignedIdentityName: existingUserAssignedIdentityName
+    userAssignedIdentitySubscriptionId: userAssignedIdentitySubscriptionId
+    userAssignedIdentityResourceGroupName: userAssignedIdentityResourceGroupName
     
     accountName: existingAccountName
     
@@ -118,7 +137,7 @@ module storageAccountRoleAssignment 'modules-network-secured/azure-storage-accou
   scope: resourceGroup(storageSubscriptionId, storageResourceGroupName)
   params: {
     azureStorageName: existingStorageName
-    projectPrincipalId: aiProject.outputs.projectPrincipalId
+    projectPrincipalId: userAssignedIdentity.properties.principalId
   }
 }
 
@@ -128,7 +147,7 @@ module cosmosAccountRoleAssignments 'modules-network-secured/cosmosdb-account-ro
   scope: resourceGroup(cosmosDBSubscriptionId, cosmosDBResourceGroupName)
   params: {
     cosmosDBName: existingCosmosDBName
-    projectPrincipalId: aiProject.outputs.projectPrincipalId
+    projectPrincipalId: userAssignedIdentity.properties.principalId
   }
 }
 
@@ -138,7 +157,7 @@ module aiSearchRoleAssignments 'modules-network-secured/ai-search-role-assignmen
   scope: resourceGroup(aiSearchSubscriptionId, aiSearchResourceGroupName)
   params: {
     aiSearchName: existingAiSearchName
-    projectPrincipalId: aiProject.outputs.projectPrincipalId
+    projectPrincipalId: userAssignedIdentity.properties.principalId
   }
 }
 
@@ -165,7 +184,7 @@ module storageContainersRoleAssignment 'modules-network-secured/blob-storage-con
   name: 'storage-containers-${uniqueSuffix}-deployment'
   scope: resourceGroup(storageSubscriptionId, storageResourceGroupName)
   params: {
-    aiProjectPrincipalId: aiProject.outputs.projectPrincipalId
+    aiProjectPrincipalId: userAssignedIdentity.properties.principalId
     storageName: existingStorageName
     workspaceId: formatProjectWorkspaceId.outputs.projectWorkspaceIdGuid
     uniqueSuffix: uniqueSuffix  // Add this line
@@ -182,7 +201,7 @@ module cosmosContainerRoleAssignments 'modules-network-secured/cosmos-container-
   params: {
     cosmosAccountName: existingCosmosDBName
     projectWorkspaceId: formatProjectWorkspaceId.outputs.projectWorkspaceIdGuid
-    projectPrincipalId: aiProject.outputs.projectPrincipalId
+    projectPrincipalId: userAssignedIdentity.properties.principalId
   }
   dependsOn: [
     addProjectCapabilityHost
@@ -192,6 +211,5 @@ module cosmosContainerRoleAssignments 'modules-network-secured/cosmos-container-
 
 // Outputs
 output projectName string = aiProject.outputs.projectName
-output projectPrincipalId string = aiProject.outputs.projectPrincipalId
 output projectWorkspaceId string = aiProject.outputs.projectWorkspaceId
 output capabilityHostName string = addProjectCapabilityHost.outputs.projectCapHost

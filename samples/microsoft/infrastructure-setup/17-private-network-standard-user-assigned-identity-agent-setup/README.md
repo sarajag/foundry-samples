@@ -1,5 +1,5 @@
 ---
-description: This set of templates demonstrates how to set up Azure AI Agent Service with virtual network isolation with private network links to connect the agent to your secure data.
+description: This set of templates demonstrates how to set up Azure AI Agent Service with virtual network isolation using User Managed Identity authetication for the AI Service with private network links to connect the agent to your secure data.
 page_type: sample
 products:
 - azure
@@ -329,6 +329,7 @@ modules-network-secured/
 ├── subnet.bicep                                    # Setting the subnet for Agent network injection
 ├── validate-existing-resources.bicep               # Validate existing CosmosDB, Storage, and Search to template deployment
 └── vnet.bicep                                      # Deploying a new virtual network
+└── user-assigned-identity.bicep                    # User-Assigned Identity
 ```
 
 > **Note:** If you bring your own VNET for this template, ensure the subnet for Agents has the correct subnet delegation to `Microsoft.App/environments`. If you have not specified the delegated subnet, the template will complete this for you.
