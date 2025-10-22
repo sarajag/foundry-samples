@@ -64,4 +64,3 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-
 output accountName string = account.name
 output accountID string = account.id
 output accountTarget string = account.properties.endpoint
-output accountPrincipalId string = account.identity.principalId
