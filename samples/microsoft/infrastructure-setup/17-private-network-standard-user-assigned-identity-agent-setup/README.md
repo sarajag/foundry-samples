@@ -14,10 +14,6 @@ languages:
 
 > **IMPORTANT**
 > 
-> Class A subnet support is only available in a limited number of regions and requires your subscription id be allowlisted. Please fill out [**this form**](https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR9ZHnlM2xH1ElCCWV7X_lllUNzJLV0FJWU4zSjVKUFpQUUJPQTlGOVVMSC4u) if you are interested in getting access.
-**Supported regions: West US, East US, East US 2, Japan East, France Central, UAE North, South Central US, Italy North, Germany West Central, Brazil South, South Africa North, Australia East, Sweden Central, Canada East, West Europe**
-
->
 > Private Class B and C subnet support is available in all regions supported by Azure AI Foundry Agent Service and Private Class A is supported in a subset of regions supported by the Azure AI Foundry Agent service. Private Class A, B, and C support are all now GA. Deployment templates and setup steps are identical for Class A, B, and C subnets. For more on the supported regions of the Azure AI Foundry Agent service, see [Models supported by Azure AI Foundry Agent Service](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/model-region-support?tabs=global-standard)
 
 ---
@@ -33,7 +29,7 @@ This implementation gives you full control over the inbound and outbound communi
 ## Key Information
 
 **Limited Region Support for Class A Subnet IPs**
-- Class A subnet support is only available in select regions and requires allowlisting of your subscription ID. 
+- Class A is supported in a subset of regions supported by the Azure AI Foundry Agent service. 
 
 **Region and Resource Placement Requirements**
 - **All Foundry workspace resources should be in the same region as the VNet**, including CosmosDB, Storage Account, AI Search, Foundry Account, Project, Managed Identity. The only exception is within the Foundry Account, you may choose to deploy your model to a different region, and any cross-region communication will be handled securely within our network infrastructure.
@@ -92,7 +88,7 @@ This implementation gives you full control over the inbound and outbound communi
   
 
   **Limitations:**
-  - Class A subnet support is only available in a limited number of regions and requires your subscription id be allowlisted. Please fill out [**this form**](https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR9ZHnlM2xH1ElCCWV7X_lllUNzJLV0FJWU4zSjVKUFpQUUJPQTlGOVVMSC4u) if you are interested in getting access.
+  - Class A is supported in a subset of regions supported by the Azure AI Foundry Agent service.
   - The capability host sub-resources of Resource/Project must be deleted before deleting the Resource/Project resource itself. You can use the script __deleteCaphost.sh__ located in this folder to delete it.  
 
 
